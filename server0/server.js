@@ -18,12 +18,6 @@ app.use(userRouts);
 app.use('*',notFoundHandler);
 app.use(errorHandler);
 
-
-
-
-
-
-
 module.exports = {
   server: app,
   start: () => {

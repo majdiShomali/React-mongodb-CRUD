@@ -5,17 +5,17 @@ const UserForm = () => {
   const [updateUser, setUpdateUser] = useState(false);
   const [userId, setUserId] = useState();
 
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [age, setAge] = useState();
-  const [email, setEmail] = useState("");
+  const [lastName, setLastName] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const userData = {
-      name: name,
+      firstName: firstName,
+      lastName: lastName,
       age: age,
-      email: email,
     };
 
     try {
@@ -27,9 +27,9 @@ const UserForm = () => {
       console.log("Data inserted:", response.data);
 
       // Clear the form fields after successful insertion
-      setName("");
+      setFirstName("");
       setAge();
-      setEmail("");
+      setLastName("");
     } catch (error) {
       console.error("Error inserting data:", error);
     }
@@ -38,7 +38,7 @@ const UserForm = () => {
   const [users, setUsers] = useState([]);
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [users]);
 
   const fetchUsers = async () => {
     try {
@@ -66,7 +66,8 @@ const UserForm = () => {
       const updatedUser = {
         // Update the properties of the user as needed
         // For example, to update the user's name and age:
-        name: name,
+        firstName: firstName,
+        lastName:lastName,
         age: age,
       };
 
@@ -80,8 +81,9 @@ const UserForm = () => {
   const handleUpdateUser = async (user,userId) => {
     setUpdateUser(true);
     setUserId(userId);
-    setName(user.name)
+    setFirstName(user.firstName)
     setAge(user.age)
+    setLastName(user.lastName)
     
   };
 
@@ -93,8 +95,8 @@ const UserForm = () => {
             Name:
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
             />
           </label>
           <br />
@@ -108,11 +110,11 @@ const UserForm = () => {
           </label>
           <br />
           <label>
-            Email:
+          LastName:
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
             />
           </label>
           <br />
@@ -124,8 +126,8 @@ const UserForm = () => {
             Name:
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
             />
           </label>
           <br />
@@ -137,8 +139,16 @@ const UserForm = () => {
               onChange={(e) => setAge(Number(e.target.value))}
             />
           </label>
+          
           <br />
-
+          <label>
+          LastName:
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </label>
           <button type="submit">update</button>
         </form>
       )}
@@ -147,9 +157,9 @@ const UserForm = () => {
         <h1>User List</h1>
         {users.map((user) => (
           <div key={user._id}>
-            <p>Name: {user.name}</p>
+            <p>FirstName: {user.firstName}</p>
             <p>Age: {user.age}</p>
-            <p>Email: {user.email}</p>
+            <p>lastName: {user.lastName}</p>
             <button onClick={() => handleDeleteUser(user._id)}>Delete</button>
             <button onClick={() => handleUpdateUser(user,user._id)}>Update</button>
 
