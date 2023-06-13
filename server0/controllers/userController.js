@@ -1,8 +1,11 @@
 // 1- calling the model
 const User = require("../models/user");
+const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
+const secretKey = "ZhQrZ951";
+
 
 const allUsers = (req, res) => {
-  // select * from users  = find();
   User.find()
     .then((data) => {
       console.log(data);
@@ -14,7 +17,6 @@ const allUsers = (req, res) => {
 };
 
 const oneUser =  async (req, res) => {
-  // User.save .....
   const id = req.params.id;
   const user = await User.find({ _id: id });
   console.log(user);
@@ -22,17 +24,45 @@ const oneUser =  async (req, res) => {
 };
 
 
+
 const newUser =  async (req, res) => {
-    const { firstName, lastName, age } = req.body;
-    const user = new User({ firstName: firstName, lastName: lastName, age: age});
+
+    const { firstName, email , password } = req.body;
+    const token = jwt.sign(
+      { email: email, password: password },
+      secretKey,
+      { expiresIn: "9weeks" }
+    ); // Generate JWT
+    console.log(token)
+    const hashPassword = await bcrypt.hash(password, 5)
+    const user = new User({ firstName: firstName, email: email,password:hashPassword});
     const addUser = await user.save();
-    // console.log(addUser);
-    res.json(addUser);
+    res.json([addUser,token]);
 };
+
+
+const newUserLogin =  async (req, res) => {
+
+  const {email , password } = req.body;
+  const user = await User.find({ email: email });
+    // password check
+    const validpassword = await bcrypt.compare(
+      password,
+      user[0].password
+    );
+    if (!validpassword) {
+      return res.json({ error: "incorrect password" });
+    }
+if(validpassword){
+  res.json(user);
+}
+};
+
 
 const updateUser = async (req, res) => {
     const userId  = req.params.id;
     const updatedUserData = req.body;
+    updatedUserData.password= await bcrypt.hash(updatedUserData.password, 5)
     const user = await User.findByIdAndUpdate(userId, updatedUserData, { new: true });
     const updatedUser = await user.save();
     res.json(updatedUser);
@@ -50,4 +80,5 @@ module.exports = {
   oneUser,
   updateUser,
   deleteUser,
+  newUserLogin,
 }; 

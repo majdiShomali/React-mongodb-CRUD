@@ -10,15 +10,16 @@ const userSchema = new Schema({
         type : String,
         required : true
     },
-    lastName: {
+    email: {
         type : String,
         required : true
     },
-    age:{
-        type : Number,
+    password:{
+        type : String,
         required : true
     }
-    }, {timestamp : true}
+    },
+     {timestamp : true}
     )
 
     // 2- export the model with the schema

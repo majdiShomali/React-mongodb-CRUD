@@ -4,18 +4,20 @@ import axios from "axios";
 const UserForm = () => {
   const [updateUser, setUpdateUser] = useState(false);
   const [userId, setUserId] = useState();
+  const [CurruntUser, setCurruntUser] = useState("");
 
   const [firstName, setFirstName] = useState("");
-  const [age, setAge] = useState();
-  const [lastName, setLastName] = useState("");
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const userData = {
       firstName: firstName,
-      lastName: lastName,
-      age: age,
+      email: email,
+      password:password
     };
 
     try {
@@ -24,12 +26,14 @@ const UserForm = () => {
         "http://localhost:5000/api/users",
         userData
       );
-      console.log("Data inserted:", response.data);
+      console.log("Data inserted:", response.data[1]);
+      localStorage.setItem("auth",response.data[1])
 
       // Clear the form fields after successful insertion
       setFirstName("");
-      setAge();
-      setLastName("");
+      setEmail("");
+      setPassword("");
+      fetchUsers();
     } catch (error) {
       console.error("Error inserting data:", error);
     }
@@ -38,7 +42,7 @@ const UserForm = () => {
   const [users, setUsers] = useState([]);
   useEffect(() => {
     fetchUsers();
-  }, [users]);
+  }, []);
 
   const fetchUsers = async () => {
     try {
@@ -65,10 +69,10 @@ const UserForm = () => {
       // Make a PUT or PATCH request to update the user
       const updatedUser = {
         // Update the properties of the user as needed
-        // For example, to update the user's name and age:
+
         firstName: firstName,
-        lastName:lastName,
-        age: age,
+        password:password,
+
       };
 
       await axios.put(`http://localhost:5000/api/users/${userId}`, updatedUser);
@@ -76,19 +80,34 @@ const UserForm = () => {
     } catch (error) {
       console.error("Error updating user:", error);
     }
+
+    setFirstName("")
+    setPassword("")
   };
 
   const handleUpdateUser = async (user,userId) => {
     setUpdateUser(true);
     setUserId(userId);
     setFirstName(user.firstName)
-    setAge(user.age)
-    setLastName(user.lastName)
+
+    setPassword("")
     
   };
 
+  const handleShowUser = async (user,userId) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/users/${userId}`);
+      setCurruntUser(response.data[0].firstName); 
+    } catch (error) {
+      console.error("Error retrieving data:", error);
+    }
+    
+  };
+
+
   return (
     <>
+    <h1>SignUp Form</h1>
       {updateUser == false ? (
         <form onSubmit={handleSubmit}>
           <label>
@@ -101,20 +120,20 @@ const UserForm = () => {
           </label>
           <br />
           <label>
-            Age:
+          email:
             <input
-              type="number"
-              value={age}
-              onChange={(e) => setAge(Number(e.target.value))}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </label>
           <br />
           <label>
-          LastName:
+          Password:
             <input
               type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </label>
           <br />
@@ -123,30 +142,22 @@ const UserForm = () => {
       ) : (
         <form onSubmit={handleSubmitUpdate}>
           <label>
-            Name:
+          New Name:
             <input
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
             />
           </label>
-          <br />
-          <label>
-            Age:
-            <input
-              type="number"
-              value={age}
-              onChange={(e) => setAge(Number(e.target.value))}
-            />
-          </label>
+ 
           
           <br />
           <label>
-          LastName:
+         New password:
             <input
               type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </label>
           <button type="submit">update</button>
@@ -155,13 +166,15 @@ const UserForm = () => {
 
       <div>
         <h1>User List</h1>
+        <h2>{CurruntUser}</h2>
         {users.map((user) => (
           <div key={user._id}>
             <p>FirstName: {user.firstName}</p>
-            <p>Age: {user.age}</p>
-            <p>lastName: {user.lastName}</p>
+            <p>email: {user.email}</p>
+            <p>password: {user.password}</p>
             <button onClick={() => handleDeleteUser(user._id)}>Delete</button>
             <button onClick={() => handleUpdateUser(user,user._id)}>Update</button>
+            <button onClick={() => handleShowUser(user,user._id)}>ShowData</button>
 
             <hr />
           </div>
